@@ -8,16 +8,13 @@ export async function GET(req: Request) {
   const position = searchParams.get("position");
   const level = searchParams.get("level");
 
-  const players = await prisma.player.findMany({
-    where: {
-      ...(sport && { sport }),
-      ...(position && { position }),
-      ...(level && { level }),
-    },
-    include: {
-      user: true,
-    },
-  });
+  const where: any = {};
+
+  if (sport) where.sport = sport;
+  if (position) where.position = position;
+  if (level) where.level = level;
+
+  const players = await prisma.player.findMany({ where });
 
   return NextResponse.json(players);
 }
