@@ -14,16 +14,13 @@ model User {
   role      Role
   premium   Boolean  @default(false)
   createdAt DateTime @default(now())
-
-  player  Player?
-  trainer Trainer?
+  player    Player?
+  trainer   Trainer?
 }
 
 model Player {
-  id          String @id @default(uuid())
-  userId      String @unique
-  user        User   @relation(fields: [userId], references: [id])
-
+  id          String   @id @default(uuid())
+  userId      String   @unique
   firstName   String
   lastName    String
   birthDate   DateTime
@@ -38,13 +35,12 @@ model Player {
   level       String
   prevClubs   String
   currentClub String?
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model Trainer {
-  id          String @id @default(uuid())
-  userId      String @unique
-  user        User   @relation(fields: [userId], references: [id])
-
+  id          String   @id @default(uuid())
+  userId      String   @unique
   firstName   String
   lastName    String
   birthDate   DateTime
@@ -55,14 +51,15 @@ model Trainer {
   certificate String?
   experience  String
   interests   String
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model Message {
-  id          String   @id @default(uuid())
-  senderId    String
-  receiverId  String
-  content     String
-  createdAt   DateTime @default(now())
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  content    String
+  createdAt  DateTime @default(now())
 }
 
 enum Role {

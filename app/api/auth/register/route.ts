@@ -36,22 +36,51 @@ export async function POST(req: Request) {
       },
     });
 
+    // 🔹 PLAYER REGISTRATION
     if (role === "PLAYER") {
       await prisma.player.create({
         data: {
           userId: user.id,
-          ...profile,
-          birthDate: new Date(profile.birthDate), // ✅ FIX
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          birthDate: new Date(profile.birthDate),
+          nationality: profile.nationality,
+          country: profile.country,
+          city: profile.city,
+          sport: profile.sport,
+          position: profile.position,
+          foot: profile.foot,
+          heightCm: Number(profile.heightCm),
+          weightKg: Number(profile.weightKg),
+          level: profile.level,
+          prevClubs: profile.prevClubs || "",
+          currentClub: profile.currentClub || null,
         },
       });
     }
 
+    // 🔹 TRAINER REGISTRATION
     if (role === "TRAINER") {
+      if (!profile.experience || !profile.interests) {
+        return NextResponse.json(
+          { error: "Trainer experience and interests are required" },
+          { status: 400 }
+        );
+      }
+
       await prisma.trainer.create({
         data: {
           userId: user.id,
-          ...profile,
-          birthDate: new Date(profile.birthDate), // ✅ FIX
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          birthDate: new Date(profile.birthDate),
+          nationality: profile.nationality,
+          country: profile.country,
+          city: profile.city,
+          sport: profile.sport,
+          certificate: profile.certificate || null,
+          experience: profile.experience,
+          interests: profile.interests,
         },
       });
     }
