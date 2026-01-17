@@ -27,59 +27,34 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        role,
+        premium: false,
+      },
+    });
+
+    if (role === "PLAYER") {
+      await prisma.player.create({
         data: {
-          email,
-          password: hashedPassword,
-          role,
-          premium: false,
+          userId: user.id,
+          ...profile,
+          birthDate: new Date(profile.birthDate), // ✅ FIX
         },
       });
+    }
 
-      if (role === "PLAYER") {
-        await tx.player.create({
-          data: {
-            userId: user.id,
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            birthDate: new Date(profile.birthDate),
-            nationality: profile.nationality,
-            country: profile.country,
-            city: profile.city,
-            sport: profile.sport,
-            position: profile.position,
-            foot: profile.foot,
-            heightCm: Number(profile.heightCm),
-            weightKg: Number(profile.weightKg),
-            level: profile.level,
-            prevClubs: profile.prevClubs || "",
-            currentClub: profile.currentClub || null,
-          },
-        });
-      }
-
-      if (role === "TRAINER") {
-        await tx.trainer.create({
-          data: {
-            userId: user.id,
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            birthDate: new Date(profile.birthDate),
-            nationality: profile.nationality,
-            country: profile.country,
-            city: profile.city,
-
-            // 🔒 ENUM-SAFE
-            sport: profile.sport as any,
-
-            certificate: profile.certificateLevel || null,
-            experience: profile.experience,
-            interests: profile.careerInterest,
-          },
-        });
-      }
-    });
+    if (role === "TRAINER") {
+      await prisma.trainer.create({
+        data: {
+          userId: user.id,
+          ...profile,
+          birthDate: new Date(profile.birthDate), // ✅ FIX
+        },
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
