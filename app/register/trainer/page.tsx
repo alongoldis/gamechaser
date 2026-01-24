@@ -2,33 +2,19 @@
 
 import { useState } from "react";
 
-export default function TrainerRegisterPage() {
+export default function PlayerRegisterPage() {
   const [message, setMessage] = useState("");
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-  async function uploadImage(file: File) {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    const json = await res.json();
-    if (res.ok) setImageUrl(json.url);
-    else alert("Image upload failed");
-  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setMessage("Submitting...");
 
     const form = e.currentTarget;
 
     const data = {
       email: form.email.value,
       password: form.password.value,
-      role: "TRAINER",
+      role: "PLAYER",
       profile: {
         firstName: form.firstName.value,
         lastName: form.lastName.value,
@@ -37,10 +23,13 @@ export default function TrainerRegisterPage() {
         country: form.country.value,
         city: form.city.value,
         sport: form.sport.value,
-        certificate: form.certificate.value,
-        experience: form.experience.value,
-        interests: form.interests.value,
-        imageUrl,
+        position: form.position.value,
+        foot: form.foot.value,
+        heightCm: Number(form.heightCm.value),
+        weightKg: Number(form.weightKg.value),
+        level: form.level.value,
+        prevClubs: form.prevClubs.value,
+        currentClub: form.currentClub.value,
       },
     };
 
@@ -51,57 +40,68 @@ export default function TrainerRegisterPage() {
     });
 
     const json = await res.json();
-    setMessage(res.ok ? "✅ Trainer registered" : `❌ ${json.error}`);
+    setMessage(res.ok ? "✅ Player registered" : `❌ ${json.error}`);
   }
 
   return (
-    <main className="container">
-      <h1>Register Trainer</h1>
+    <div className="page-container">
+      <h1>Player Registration</h1>
+      <p className="subtitle">Create your player profile</p>
 
-      <form onSubmit={handleSubmit} className="card">
-        <input name="email" placeholder="Email" required />
-        <input name="password" type="password" placeholder="Password" required />
-        <input name="firstName" placeholder="First name" required />
-        <input name="lastName" placeholder="Last name" required />
-        <label>Date of birth</label>
-        <input name="birthDate" type="date" required />
+      <form onSubmit={handleSubmit}>
+        <div className="section">
+          <div className="section-title">Account</div>
+          <input name="email" placeholder="Email" required />
+          <input name="password" type="password" placeholder="Password" required />
+        </div>
 
-        <input name="nationality" placeholder="Nationality" required />
-        <input name="country" placeholder="Country" required />
-        <input name="city" placeholder="City" required />
+        <div className="section">
+          <div className="section-title">Personal Details</div>
+          <input name="firstName" placeholder="First name" required />
+          <input name="lastName" placeholder="Last name" required />
+          <label>Date of birth</label>
+          <input name="birthDate" type="date" required />
+          <input name="nationality" placeholder="Nationality" required />
+          <input name="country" placeholder="Country of residence" required />
+          <input name="city" placeholder="City" required />
+        </div>
 
-        <select name="sport" required>
-          <option value="">Sport</option>
-          <option value="FOOTBALL">Football</option>
-          <option value="BASKETBALL">Basketball</option>
-          <option value="VOLLEYBALL">Volleyball</option>
-          <option value="TENNIS">Tennis</option>
-          <option value="PADEL">Padel</option>
-        </select>
+        <div className="section">
+          <div className="section-title">Sport Profile</div>
+          <select name="sport" required>
+            <option value="">Select sport</option>
+            <option value="FOOTBALL">Football</option>
+            <option value="BASKETBALL">Basketball</option>
+            <option value="VOLLEYBALL">Volleyball</option>
+            <option value="TENNIS">Tennis</option>
+            <option value="PADEL">Padel</option>
+          </select>
 
-        <input name="certificate" placeholder="Certificates" />
-        <textarea name="experience" placeholder="Experience" required />
-        <textarea name="interests" placeholder="Interests" required />
+          <input name="position" placeholder="Position" />
+          <select name="foot">
+            <option value="">Handedness</option>
+            <option value="Right">Right</option>
+            <option value="Left">Left</option>
+            <option value="Both">Both</option>
+          </select>
 
-        <label>Profile picture</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => e.target.files && uploadImage(e.target.files[0])}
-        />
+          <input name="heightCm" type="number" placeholder="Height (cm)" />
+          <input name="weightKg" type="number" placeholder="Weight (kg)" />
 
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt="Preview"
-            style={{ width: 120, borderRadius: "50%" }}
-          />
-        )}
+          <select name="level">
+            <option value="">Current level</option>
+            <option value="Professional">Professional</option>
+            <option value="Semi-professional">Semi-professional</option>
+            <option value="Amateur">Amateur</option>
+          </select>
 
-        <button type="submit">Register Trainer</button>
+          <input name="prevClubs" placeholder="Previous clubs" />
+          <input name="currentClub" placeholder="Current club" />
+        </div>
+
+        <button type="submit">Register Player</button>
+        <div className="message">{message}</div>
       </form>
-
-      <p>{message}</p>
-    </main>
+    </div>
   );
 }
