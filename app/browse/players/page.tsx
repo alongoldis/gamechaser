@@ -1,70 +1,50 @@
-"use client";
+import { prisma } from "../../../lib/db";
 
-import { useEffect, useState } from "react";
-
-export default function BrowsePlayersPage() {
-  const [players, setPlayers] = useState<any[]>([]);
-  const [sport, setSport] = useState("");
-  const [position, setPosition] = useState("");
-  const [level, setLevel] = useState("");
-
-  async function loadPlayers() {
-    const params = new URLSearchParams();
-    if (sport) params.append("sport", sport);
-    if (position) params.append("position", position);
-    if (level) params.append("level", level);
-
-    const res = await fetch(`/api/browse/players?${params.toString()}`);
-    const data = await res.json();
-    setPlayers(data);
-  }
-
-  useEffect(() => {
-    loadPlayers();
-  }, []);
+export default async function BrowsePlayersPage() {
+  const players = await prisma.player.findMany({
+    orderBy: { lastName: "asc" },
+  });
 
   return (
-    <main style={{ padding: 40 }}>
-      <h1>Browse Players</h1>
-
-      <div style={{ marginBottom: 20 }}>
-        <input
-          placeholder="Sport"
-          value={sport}
-          onChange={(e) => setSport(e.target.value)}
-        />{" "}
-        <input
-          placeholder="Position"
-          value={position}
-          onChange={(e) => setPosition(e.target.value)}
-        />{" "}
-        <input
-          placeholder="Level"
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-        />{" "}
-        <button onClick={loadPlayers}>Search</button>
-      </div>
+    <main>
+      <section style={{ marginBottom: 32 }}>
+        <h1>Browse Players</h1>
+        <p className="subtitle">
+          Discover players available for new opportunities
+        </p>
+      </section>
 
       {players.length === 0 && <p>No players found.</p>}
 
-      {players.map((p) => (
-        <div
-          key={p.id}
-          style={{
-            borderBottom: "1px solid #ddd",
-            marginBottom: 15,
-            paddingBottom: 10,
-          }}
-        >
-          <strong>
-            {p.firstName} {p.lastName}
-          </strong>
-          <div>Sport: {p.sport}</div>
-          <div>Position: {p.position}</div>
-          <div>Level: {p.level}</div>
-        </div>
-      ))}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gap: 20,
+        }}
+      >
+        {players.map((player) => (
+          <div className="card" key={player.id}>
+            <h3>
+              {player.firstName} {player.lastName}
+            </h3>
+
+            <span className="badge">{player.level}</span>
+
+            <p style={{ color: "#6b7280" }}>
+              📍 {player.city}, {player.country}
+            </p>
+
+            <p>
+              🏅 <strong>{player.sport}</strong> · {player.position}
+            </p>
+
+            <p style={{ fontSize: 14, color: "#6b7280" }}>
+              {player.heightCm} cm · {player.weightKg} kg
+            </p>
+          </div>
+        ))}
+      </div>
     </main>
   );
 }

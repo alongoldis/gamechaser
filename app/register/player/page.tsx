@@ -2,21 +2,6 @@
 
 import { useState } from "react";
 
-const COUNTRIES = [
-  "Netherlands",
-  "Belgium",
-  "Germany",
-  "France",
-  "Spain",
-  "Italy",
-  "United Kingdom",
-  "Portugal",
-  "USA",
-  "Brazil",
-  "Argentina",
-  "Other",
-];
-
 export default function PlayerRegisterPage() {
   const [message, setMessage] = useState("");
 
@@ -37,10 +22,7 @@ export default function PlayerRegisterPage() {
         nationality: form.nationality.value,
         country: form.country.value,
         city: form.city.value,
-
-        // 🔒 ENUM-SAFE VALUE
         sport: form.sport.value,
-
         position: form.position.value,
         foot: form.foot.value,
         heightCm: Number(form.heightCm.value),
@@ -67,76 +49,111 @@ export default function PlayerRegisterPage() {
     }
   }
 
+  const sectionStyle = {
+    border: "1px solid #e5e7eb",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    background: "#fafafa",
+  };
+
   return (
-    <main style={{ padding: 40 }}>
+    <main>
       <h1>Player Registration</h1>
+      <p className="subtitle">
+        Create your player profile and get discovered
+      </p>
 
       <form onSubmit={handleSubmit}>
-        <input name="email" placeholder="Email" required /><br /><br />
-        <input name="password" type="password" placeholder="Password" required /><br /><br />
+        {/* Account */}
+        <div style={sectionStyle}>
+          <h3>Account</h3>
 
-        <input name="firstName" placeholder="First name" required /><br /><br />
-        <input name="lastName" placeholder="Last name" required /><br /><br />
+          <label>Email</label>
+          <input name="email" className="input" required />
 
-        <label>Date of Birth</label><br />
-        <input name="birthDate" type="date" required /><br /><br />
+          <label>Password</label>
+          <input name="password" type="password" className="input" required />
+        </div>
 
-        <label>Nationality</label><br />
-        <select name="nationality" required>
-          <option value="">Select nationality</option>
-          {COUNTRIES.map(c => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select><br /><br />
+        {/* Personal */}
+        <div style={sectionStyle}>
+          <h3>Personal Details</h3>
 
-        <label>Country of Residence</label><br />
-        <select name="country" required>
-          <option value="">Select country</option>
-          {COUNTRIES.map(c => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select><br /><br />
+          <label>First name</label>
+          <input name="firstName" className="input" required />
 
-        <input name="city" placeholder="City" required /><br /><br />
+          <label>Last name</label>
+          <input name="lastName" className="input" required />
 
-        <label>Sport</label><br />
-        <select name="sport" required>
-          <option value="">Select sport</option>
-          <option value="FOOTBALL">Football</option>
-          <option value="BASKETBALL">Basketball</option>
-          <option value="VOLLEYBALL">Volleyball</option>
-          <option value="TENNIS">Tennis</option>
-          <option value="PADEL">Padel</option>
-        </select><br /><br />
+          <label>Date of birth</label>
+          <input name="birthDate" type="date" className="input" required />
 
-        <input name="position" placeholder="Position" required /><br /><br />
+          <label>Nationality</label>
+          <input name="nationality" className="input" required />
 
-        <label>Handedness</label><br />
-        <select name="foot" required>
-          <option value="">Select</option>
-          <option value="RIGHT">Right</option>
-          <option value="LEFT">Left</option>
-          <option value="BOTH">Both</option>
-        </select><br /><br />
+          <label>Country of residence</label>
+          <input name="country" className="input" required />
 
-        <input name="heightCm" type="number" placeholder="Height (cm)" required /><br /><br />
-        <input name="weightKg" type="number" placeholder="Weight (kg)" required /><br /><br />
+          <label>City</label>
+          <input name="city" className="input" required />
+        </div>
 
-        <label>Current level</label><br />
-        <select name="level" required>
-          <option value="">Select level</option>
-          <option value="PROFESSIONAL">Professional</option>
-          <option value="SEMI_PRO">Semi-professional</option>
-          <option value="AMATEUR">Amateur</option>
-        </select><br /><br />
+        {/* Sport */}
+        <div style={sectionStyle}>
+          <h3>Sport Profile</h3>
 
-        <input name="prevClubs" placeholder="Previous clubs" /><br /><br />
-        <input name="currentClub" placeholder="Current club (if any)" /><br /><br />
+          <label>Sport</label>
+          <select name="sport" required>
+            <option value="">Select sport</option>
+            <option value="FOOTBALL">Football</option>
+            <option value="BASKETBALL">Basketball</option>
+            <option value="VOLLEYBALL">Volleyball</option>
+            <option value="TENNIS">Tennis</option>
+            <option value="PADEL">Padel</option>
+          </select>
 
-        <button type="submit">Register Player</button>
+          <label>Position</label>
+          <input name="position" className="input" required />
+
+          <label>Handedness</label>
+          <select name="foot" required>
+            <option value="">Select</option>
+            <option value="Right">Right</option>
+            <option value="Left">Left</option>
+            <option value="Both">Both</option>
+          </select>
+
+          <label>Height (cm)</label>
+          <input name="heightCm" type="number" className="input" required />
+
+          <label>Weight (kg)</label>
+          <input name="weightKg" type="number" className="input" required />
+
+          <label>Current level</label>
+          <select name="level" required>
+            <option value="">Select level</option>
+            <option value="Professional">Professional</option>
+            <option value="Semi-professional">Semi-professional</option>
+            <option value="Amateur">Amateur</option>
+          </select>
+
+          <label>Previous clubs</label>
+          <input name="prevClubs" className="input" />
+
+          <label>Current club</label>
+          <input name="currentClub" className="input" />
+        </div>
+
+        <button className="button">Register Player</button>
       </form>
 
-      <p>{message}</p>
+      {message.includes("✅") && (
+        <p className="message-success">{message}</p>
+      )}
+      {message.includes("❌") && (
+        <p className="message-error">{message}</p>
+      )}
     </main>
   );
 }

@@ -1,3 +1,5 @@
+import "./globals.css";
+
 export default function RootLayout({
   children,
 }: {
@@ -6,11 +8,29 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <nav style={{ padding: 20, borderBottom: "1px solid #ddd" }}>
-          <a href="/" style={{ marginRight: 15 }}>Home</a>
-          <a href="/register/player" style={{ marginRight: 15 }}>Register Player</a>
-          <a href="/register/trainer">Register Trainer</a>
+        <nav
+          style={{
+            background: "white",
+            padding: "16px 24px",
+            borderBottom: "1px solid #e5e7eb",
+            marginBottom: 24,
+          }}
+        >
+          <a href="/" style={{ marginRight: 20 }}>Home</a>
+          <a href="/register/player" style={{ marginRight: 20 }}>
+            Register Player
+          </a>
+          <a href="/register/trainer" style={{ marginRight: 20 }}>
+            Register Trainer
+          </a>
+          <a href="/browse/players" style={{ marginRight: 20 }}>
+            Browse Players
+          </a>
+          <a href="/browse/trainers">
+            Browse Trainers
+          </a>
         </nav>
+
         <main>{children}</main>
       </body>
     </html>

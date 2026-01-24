@@ -45,43 +45,104 @@ export default function TrainerRegisterPage() {
     }
   }
 
+  const sectionStyle = {
+    border: "1px solid #e5e7eb",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    background: "#fafafa",
+  };
+
   return (
-    <main style={{ padding: 40 }}>
+    <main>
       <h1>Trainer Registration</h1>
+      <p className="subtitle">
+        Create your trainer profile and connect with clubs and players
+      </p>
 
       <form onSubmit={handleSubmit}>
-        <input name="email" placeholder="Email" required /><br /><br />
-        <input name="password" type="password" placeholder="Password" required /><br /><br />
+        {/* Account */}
+        <div style={sectionStyle}>
+          <h3>Account</h3>
 
-        <input name="firstName" placeholder="First name" required /><br /><br />
-        <input name="lastName" placeholder="Last name" required /><br /><br />
+          <label>Email</label>
+          <input name="email" className="input" required />
 
-        <label>Date of Birth</label><br />
-        <input name="birthDate" type="date" required /><br /><br />
+          <label>Password</label>
+          <input
+            name="password"
+            type="password"
+            className="input"
+            required
+          />
+        </div>
 
-        <input name="nationality" placeholder="Nationality" required /><br /><br />
-        <input name="country" placeholder="Country" required /><br /><br />
-        <input name="city" placeholder="City" required /><br /><br />
+        {/* Personal */}
+        <div style={sectionStyle}>
+          <h3>Personal Details</h3>
 
-        <select name="sport" required>
-          <option value="">Select sport</option>
-          <option value="FOOTBALL">Football</option>
-          <option value="BASKETBALL">Basketball</option>
-          <option value="VOLLEYBALL">Volleyball</option>
-          <option value="TENNIS">Tennis</option>
-          <option value="PADEL">Padel</option>
-        </select>
-        <br /><br />
+          <label>First name</label>
+          <input name="firstName" className="input" required />
 
-        <input name="certificate" placeholder="Certificate (optional)" /><br /><br />
+          <label>Last name</label>
+          <input name="lastName" className="input" required />
 
-        <input name="experience" placeholder="Trainer experience" required /><br /><br />
-        <input name="interests" placeholder="Trainer interests" required /><br /><br />
+          <label>Date of birth</label>
+          <input name="birthDate" type="date" className="input" required />
 
-        <button type="submit">Register Trainer</button>
+          <label>Nationality</label>
+          <input name="nationality" className="input" required />
+
+          <label>Country of residence</label>
+          <input name="country" className="input" required />
+
+          <label>City</label>
+          <input name="city" className="input" required />
+        </div>
+
+        {/* Professional */}
+        <div style={sectionStyle}>
+          <h3>Professional Profile</h3>
+
+          <label>Sport specialization</label>
+          <select name="sport" required>
+            <option value="">Select sport</option>
+            <option value="FOOTBALL">Football</option>
+            <option value="BASKETBALL">Basketball</option>
+            <option value="VOLLEYBALL">Volleyball</option>
+            <option value="TENNIS">Tennis</option>
+            <option value="PADEL">Padel</option>
+          </select>
+
+          <label>Coaching certificate (optional)</label>
+          <input name="certificate" className="input" />
+
+          <label>Experience (clubs / years / level)</label>
+          <input
+            name="experience"
+            className="input"
+            placeholder="e.g. 5 years at amateur clubs"
+            required
+          />
+
+          <label>Career interests</label>
+          <input
+            name="interests"
+            className="input"
+            placeholder="e.g. senior teams in Europe"
+            required
+          />
+        </div>
+
+        <button className="button">Register Trainer</button>
       </form>
 
-      <p>{message}</p>
+      {message.includes("✅") && (
+        <p className="message-success">{message}</p>
+      )}
+      {message.includes("❌") && (
+        <p className="message-error">{message}</p>
+      )}
     </main>
   );
 }

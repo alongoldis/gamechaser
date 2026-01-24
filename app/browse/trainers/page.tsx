@@ -1,38 +1,50 @@
-"use client";
+import { prisma } from "../../../lib/db";
 
-import { useEffect, useState } from "react";
-
-export default function BrowseTrainersPage() {
-  const [trainers, setTrainers] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetch("/api/browse/trainers")
-      .then((res) => res.json())
-      .then(setTrainers);
-  }, []);
+export default async function BrowseTrainersPage() {
+  const trainers = await prisma.trainer.findMany({
+    orderBy: { lastName: "asc" },
+  });
 
   return (
-    <main style={{ padding: 40 }}>
-      <h1>Browse Trainers</h1>
+    <main>
+      <section style={{ marginBottom: 32 }}>
+        <h1>Browse Trainers</h1>
+        <p className="subtitle">
+          Find experienced trainers looking for new challenges
+        </p>
+      </section>
 
-      {trainers.length === 0 && <p>No trainers yet.</p>}
+      {trainers.length === 0 && <p>No trainers found.</p>}
 
-      {trainers.map((t) => (
-        <div
-          key={t.id}
-          style={{
-            borderBottom: "1px solid #ddd",
-            marginBottom: 15,
-            paddingBottom: 10,
-          }}
-        >
-          <strong>
-            {t.firstName} {t.lastName}
-          </strong>
-          <div>Specialization: {t.specialization}</div>
-          <div>Experience: {t.experience}</div>
-        </div>
-      ))}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gap: 20,
+        }}
+      >
+        {trainers.map((trainer) => (
+          <div className="card" key={trainer.id}>
+            <h3>
+              {trainer.firstName} {trainer.lastName}
+            </h3>
+
+            <span className="badge">{trainer.sport}</span>
+
+            <p style={{ color: "#6b7280" }}>
+              📍 {trainer.city}, {trainer.country}
+            </p>
+
+            <p>
+              <strong>Experience:</strong> {trainer.experience}
+            </p>
+
+            <p style={{ fontSize: 14, color: "#6b7280" }}>
+              Interests: {trainer.interests}
+            </p>
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
