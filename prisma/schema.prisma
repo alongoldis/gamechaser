@@ -14,52 +14,59 @@ model User {
   role      Role
   premium   Boolean  @default(false)
   createdAt DateTime @default(now())
-  player    Player?
-  trainer   Trainer?
+
+  player  Player?
+  trainer Trainer?
 }
 
 model Player {
-  id          String   @id @default(uuid())
-  userId      String   @unique
-  firstName   String
-  lastName    String
-  birthDate   DateTime
-  nationality String
-  country     String
-  city        String
-  sport       Sport
-  position    String
-  foot        String
-  heightCm    Int
-  weightKg    Int
-  level       String
-  prevClubs   String
-  currentClub String?
-  user        User     @relation(fields: [userId], references: [id])
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+
+  firstName     String
+  lastName      String
+  birthDate     DateTime
+  nationality   String
+  country       String
+  city          String
+  sport         Sport
+  position      String
+  foot          String
+  heightCm      Int
+  weightKg      Int
+  level         String
+  prevClubs     String
+  currentClub   String?
+
+  profileImage  String?   // 👈 NEW (image URL)
 }
 
 model Trainer {
-  id          String   @id @default(uuid())
-  userId      String   @unique
-  firstName   String
-  lastName    String
-  birthDate   DateTime
-  nationality String
-  country     String
-  city        String
-  sport       Sport
-  certificate String?
-  experience  String
-  interests   String
-  user        User     @relation(fields: [userId], references: [id])
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+
+  firstName     String
+  lastName      String
+  birthDate     DateTime
+  nationality   String
+  country       String
+  city          String
+  sport         Sport
+  certificate   String?
+  experience    String
+  interests     String
+
+  profileImage  String?   // 👈 NEW (image URL)
 }
 
 model Message {
-  id         String   @id @default(uuid())
-  senderId   String
-  receiverId String
-  content    String
-  createdAt  DateTime @default(now())
+  id          String   @id @default(uuid())
+  senderId    String
+  receiverId  String
+  content     String
+  createdAt   DateTime @default(now())
 }
 
 enum Role {

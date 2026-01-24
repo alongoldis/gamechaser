@@ -4,13 +4,32 @@ import { useState } from "react";
 
 export default function PlayerRegisterPage() {
   const [message, setMessage] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage("Submitting...");
 
     const form = e.currentTarget;
+    const file = (form.profileImage as HTMLInputElement).files?.[0];
 
+    let imageUrl: string | null = null;
+
+    // 1️⃣ Upload image first (if selected)
+    if (file) {
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      const uploadJson = await uploadRes.json();
+      imageUrl = uploadJson.url;
+    }
+
+    // 2️⃣ Register player
     const data = {
       email: form.email.value,
       password: form.password.value,
@@ -30,6 +49,7 @@ export default function PlayerRegisterPage() {
         level: form.level.value,
         prevClubs: form.prevClubs.value,
         currentClub: form.currentClub.value,
+        imageUrl,
       },
     };
 
@@ -44,66 +64,40 @@ export default function PlayerRegisterPage() {
     if (res.ok) {
       setMessage("✅ Player registered successfully");
       form.reset();
+      setImagePreview(null);
     } else {
       setMessage(`❌ ${json.error}`);
     }
   }
 
-  const sectionStyle = {
-    border: "1px solid #e5e7eb",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    background: "#fafafa",
-  };
-
   return (
-    <main>
+    <main className="form-card">
       <h1>Player Registration</h1>
-      <p className="subtitle">
-        Create your player profile and get discovered
-      </p>
+      <p className="subtitle">Create your player profile and get discovered</p>
 
-      <form onSubmit={handleSubmit}>
-        {/* Account */}
-        <div style={sectionStyle}>
+      <form onSubmit={handleSubmit} className="form">
+        {/* ACCOUNT */}
+        <section>
           <h3>Account</h3>
+          <input name="email" placeholder="Email" required />
+          <input name="password" type="password" placeholder="Password" required />
+        </section>
 
-          <label>Email</label>
-          <input name="email" className="input" required />
-
-          <label>Password</label>
-          <input name="password" type="password" className="input" required />
-        </div>
-
-        {/* Personal */}
-        <div style={sectionStyle}>
+        {/* PERSONAL */}
+        <section>
           <h3>Personal Details</h3>
+          <input name="firstName" placeholder="First name" required />
+          <input name="lastName" placeholder="Last name" required />
+          <input name="birthDate" type="date" required />
+          <input name="nationality" placeholder="Nationality" required />
+          <input name="country" placeholder="Country of residence" required />
+          <input name="city" placeholder="City" required />
+        </section>
 
-          <label>First name</label>
-          <input name="firstName" className="input" required />
-
-          <label>Last name</label>
-          <input name="lastName" className="input" required />
-
-          <label>Date of birth</label>
-          <input name="birthDate" type="date" className="input" required />
-
-          <label>Nationality</label>
-          <input name="nationality" className="input" required />
-
-          <label>Country of residence</label>
-          <input name="country" className="input" required />
-
-          <label>City</label>
-          <input name="city" className="input" required />
-        </div>
-
-        {/* Sport */}
-        <div style={sectionStyle}>
+        {/* SPORT */}
+        <section>
           <h3>Sport Profile</h3>
 
-          <label>Sport</label>
           <select name="sport" required>
             <option value="">Select sport</option>
             <option value="FOOTBALL">Football</option>
@@ -113,47 +107,57 @@ export default function PlayerRegisterPage() {
             <option value="PADEL">Padel</option>
           </select>
 
-          <label>Position</label>
-          <input name="position" className="input" required />
+          <input name="position" placeholder="Position" required />
 
-          <label>Handedness</label>
           <select name="foot" required>
-            <option value="">Select</option>
-            <option value="Right">Right</option>
-            <option value="Left">Left</option>
-            <option value="Both">Both</option>
+            <option value="">Handedness</option>
+            <option value="RIGHT">Right</option>
+            <option value="LEFT">Left</option>
+            <option value="BOTH">Both</option>
           </select>
 
-          <label>Height (cm)</label>
-          <input name="heightCm" type="number" className="input" required />
+          <input name="heightCm" type="number" placeholder="Height (cm)" required />
+          <input name="weightKg" type="number" placeholder="Weight (kg)" required />
 
-          <label>Weight (kg)</label>
-          <input name="weightKg" type="number" className="input" required />
-
-          <label>Current level</label>
           <select name="level" required>
-            <option value="">Select level</option>
+            <option value="">Current level</option>
             <option value="Professional">Professional</option>
             <option value="Semi-professional">Semi-professional</option>
             <option value="Amateur">Amateur</option>
           </select>
 
-          <label>Previous clubs</label>
-          <input name="prevClubs" className="input" />
+          <input name="prevClubs" placeholder="Previous clubs" />
+          <input name="currentClub" placeholder="Current club" />
+        </section>
 
-          <label>Current club</label>
-          <input name="currentClub" className="input" />
-        </div>
+        {/* IMAGE UPLOAD */}
+        <section>
+          <h3>Profile Picture</h3>
 
-        <button className="button">Register Player</button>
+          <input
+            type="file"
+            name="profileImage"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setImagePreview(URL.createObjectURL(file));
+              }
+            }}
+          />
+
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="image-preview"
+            />
+          )}
+        </section>
+
+        <button type="submit">Register Player</button>
+        <p>{message}</p>
       </form>
-
-      {message.includes("✅") && (
-        <p className="message-success">{message}</p>
-      )}
-      {message.includes("❌") && (
-        <p className="message-error">{message}</p>
-      )}
     </main>
   );
 }
