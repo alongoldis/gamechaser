@@ -4,91 +4,58 @@ import { useState } from "react";
 
 export default function PlayerRegisterPage() {
   const [message, setMessage] = useState("");
-  const [preview, setPreview] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage("Submitting...");
 
     const form = e.currentTarget;
-    const file = (form.profileImage as HTMLInputElement).files?.[0];
+    const formData = new FormData(form);
 
-    let imageUrl: string | null = null;
-
-    // Upload image first
-    if (file) {
-      const fd = new FormData();
-      fd.append("file", file);
-
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: fd,
-      });
-
-      const uploadJson = await uploadRes.json();
-      imageUrl = uploadJson.url;
-    }
-
-    const data = {
-      email: form.email.value,
-      password: form.password.value,
-      role: "PLAYER",
-      profile: {
-        firstName: form.firstName.value,
-        lastName: form.lastName.value,
-        birthDate: form.birthDate.value,
-        nationality: form.nationality.value,
-        country: form.country.value,
-        city: form.city.value,
-        sport: form.sport.value,
-        position: form.position.value,
-        foot: form.foot.value,
-        heightCm: Number(form.heightCm.value),
-        weightKg: Number(form.weightKg.value),
-        level: form.level.value,
-        prevClubs: form.prevClubs.value,
-        currentClub: form.currentClub.value,
-        profileImage: imageUrl,
-      },
-    };
+    formData.append("role", "PLAYER");
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: formData,
     });
 
     const json = await res.json();
-    setMessage(res.ok ? "✅ Player registered" : `❌ ${json.error}`);
+
+    if (res.ok) {
+      setMessage("✅ Player registered successfully");
+      form.reset();
+    } else {
+      setMessage(`❌ ${json.error || "Registration failed"}`);
+    }
   }
 
   return (
-    <div className="page-container">
-      <h1>Player Registration</h1>
-      <p className="subtitle">Create your player profile</p>
+    <main className="page">
+      <form className="card" onSubmit={handleSubmit}>
+        <h1>Player Registration</h1>
+        <p className="subtitle">Create your player profile</p>
 
-      <form onSubmit={handleSubmit}>
-        <div className="section">
-          <div className="section-title">Account</div>
+        <section>
+          <h3>Account</h3>
           <input name="email" placeholder="Email" required />
           <input name="password" type="password" placeholder="Password" required />
-        </div>
+        </section>
 
-        <div className="section">
-          <div className="section-title">Personal Details</div>
+        <section>
+          <h3>Personal Details</h3>
           <input name="firstName" placeholder="First name" required />
           <input name="lastName" placeholder="Last name" required />
-          <label>Date of birth</label>
           <input name="birthDate" type="date" required />
           <input name="nationality" placeholder="Nationality" required />
           <input name="country" placeholder="Country of residence" required />
           <input name="city" placeholder="City" required />
-        </div>
+        </section>
 
-        <div className="section">
-          <div className="section-title">Sport Profile</div>
+        <section>
+          <h3>Sport Profile</h3>
+
           <select name="sport" required>
-            <option value="">Sport</option>
+            <option value="">Select sport</option>
             <option value="FOOTBALL">Football</option>
             <option value="BASKETBALL">Basketball</option>
             <option value="VOLLEYBALL">Volleyball</option>
@@ -96,52 +63,38 @@ export default function PlayerRegisterPage() {
             <option value="PADEL">Padel</option>
           </select>
 
-          <input name="position" placeholder="Position" />
-          <select name="foot">
+          <input name="position" placeholder="Position" required />
+
+          <select name="foot" required>
             <option value="">Handedness</option>
-            <option>Right</option>
-            <option>Left</option>
-            <option>Both</option>
+            <option value="RIGHT">Right</option>
+            <option value="LEFT">Left</option>
+            <option value="BOTH">Both</option>
           </select>
 
-          <input name="heightCm" type="number" placeholder="Height (cm)" />
-          <input name="weightKg" type="number" placeholder="Weight (kg)" />
+          <input name="heightCm" type="number" placeholder="Height (cm)" required />
+          <input name="weightKg" type="number" placeholder="Weight (kg)" required />
 
-          <select name="level">
+          <select name="level" required>
             <option value="">Current level</option>
-            <option>Professional</option>
-            <option>Semi-professional</option>
-            <option>Amateur</option>
+            <option value="Professional">Professional</option>
+            <option value="Semi-professional">Semi-professional</option>
+            <option value="Amateur">Amateur</option>
           </select>
 
           <input name="prevClubs" placeholder="Previous clubs" />
           <input name="currentClub" placeholder="Current club" />
-        </div>
+        </section>
 
-        <div className="section">
-          <div className="section-title">Profile Picture</div>
-          <input
-            type="file"
-            name="profileImage"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) setPreview(URL.createObjectURL(file));
-            }}
-          />
-
-          {preview && (
-            <img
-              src={preview}
-              alt="Preview"
-              style={{ width: 120, borderRadius: "50%", marginTop: 12 }}
-            />
-          )}
-        </div>
+        <section>
+          <h3>Profile Picture</h3>
+          <input type="file" name="image" accept="image/*" />
+        </section>
 
         <button type="submit">Register Player</button>
-        <div className="message">{message}</div>
+
+        {message && <p className="message">{message}</p>}
       </form>
-    </div>
+    </main>
   );
 }

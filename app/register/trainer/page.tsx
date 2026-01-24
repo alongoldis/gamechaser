@@ -4,86 +4,58 @@ import { useState } from "react";
 
 export default function TrainerRegisterPage() {
   const [message, setMessage] = useState("");
-  const [preview, setPreview] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage("Submitting...");
 
     const form = e.currentTarget;
-    const file = (form.profileImage as HTMLInputElement).files?.[0];
+    const formData = new FormData(form);
 
-    let imageUrl: string | null = null;
-
-    if (file) {
-      const fd = new FormData();
-      fd.append("file", file);
-
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: fd,
-      });
-
-      const uploadJson = await uploadRes.json();
-      imageUrl = uploadJson.url;
-    }
-
-    const data = {
-      email: form.email.value,
-      password: form.password.value,
-      role: "TRAINER",
-      profile: {
-        firstName: form.firstName.value,
-        lastName: form.lastName.value,
-        birthDate: form.birthDate.value,
-        nationality: form.nationality.value,
-        country: form.country.value,
-        city: form.city.value,
-        sport: form.sport.value,
-        certificate: form.certificate.value,
-        experience: form.experience.value,
-        interests: form.interests.value,
-        profileImage: imageUrl,
-      },
-    };
+    formData.append("role", "TRAINER");
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: formData,
     });
 
     const json = await res.json();
-    setMessage(res.ok ? "✅ Trainer registered" : `❌ ${json.error}`);
+
+    if (res.ok) {
+      setMessage("✅ Trainer registered successfully");
+      form.reset();
+    } else {
+      setMessage(`❌ ${json.error || "Registration failed"}`);
+    }
   }
 
   return (
-    <div className="page-container">
-      <h1>Trainer Registration</h1>
-      <p className="subtitle">Create your trainer profile</p>
+    <main className="page">
+      <form className="card" onSubmit={handleSubmit}>
+        <h1>Trainer Registration</h1>
+        <p className="subtitle">Create your trainer profile</p>
 
-      <form onSubmit={handleSubmit}>
-        <div className="section">
-          <div className="section-title">Account</div>
+        <section>
+          <h3>Account</h3>
           <input name="email" placeholder="Email" required />
           <input name="password" type="password" placeholder="Password" required />
-        </div>
+        </section>
 
-        <div className="section">
-          <div className="section-title">Personal Details</div>
+        <section>
+          <h3>Personal Details</h3>
           <input name="firstName" placeholder="First name" required />
           <input name="lastName" placeholder="Last name" required />
-          <label>Date of birth</label>
           <input name="birthDate" type="date" required />
           <input name="nationality" placeholder="Nationality" required />
           <input name="country" placeholder="Country of residence" required />
           <input name="city" placeholder="City" required />
-        </div>
+        </section>
 
-        <div className="section">
-          <div className="section-title">Professional Profile</div>
+        <section>
+          <h3>Professional Profile</h3>
+
           <select name="sport" required>
-            <option value="">Sport</option>
+            <option value="">Select sport</option>
             <option value="FOOTBALL">Football</option>
             <option value="BASKETBALL">Basketball</option>
             <option value="VOLLEYBALL">Volleyball</option>
@@ -91,35 +63,20 @@ export default function TrainerRegisterPage() {
             <option value="PADEL">Padel</option>
           </select>
 
-          <input name="certificate" placeholder="Coaching certificate" />
+          <input name="certificate" placeholder="Certificates (optional)" />
           <input name="experience" placeholder="Experience" required />
-          <input name="interests" placeholder="Career interests" required />
-        </div>
+          <input name="interests" placeholder="Coaching interests" required />
+        </section>
 
-        <div className="section">
-          <div className="section-title">Profile Picture</div>
-          <input
-            type="file"
-            name="profileImage"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) setPreview(URL.createObjectURL(file));
-            }}
-          />
-
-          {preview && (
-            <img
-              src={preview}
-              alt="Preview"
-              style={{ width: 120, borderRadius: "50%", marginTop: 12 }}
-            />
-          )}
-        </div>
+        <section>
+          <h3>Profile Picture</h3>
+          <input type="file" name="image" accept="image/*" />
+        </section>
 
         <button type="submit">Register Trainer</button>
-        <div className="message">{message}</div>
+
+        {message && <p className="message">{message}</p>}
       </form>
-    </div>
+    </main>
   );
 }
